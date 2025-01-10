@@ -46,8 +46,11 @@ def distribute_data_to_rank(
     arrow_batch_size: int,
     rank: int,
     world_size: int,
+    s3_profile: str | None = None,
 ) -> ArrowFileIterator:
-    dataset_chunks = find_and_sanitize_chunks(dataset_path, world_size)
+    dataset_chunks = find_and_sanitize_chunks(
+        dataset_path, world_size, s3_profile=s3_profile
+    )
     n_workers_per_chunk = world_size // len(dataset_chunks)
     rank_to_arrow_iterator_params = []
     for chunk_path in dataset_chunks:
@@ -61,6 +64,7 @@ def distribute_data_to_rank(
                     dataset_files=None,
                     entropy_model_name=entropy_model_name,
                     arrow_batch_size=arrow_batch_size,
+                    s3_profile=s3_profile,
                 )
             )
     return rank_to_arrow_iterator_params[rank]
@@ -68,6 +72,7 @@ def distribute_data_to_rank(
 
 class DataloaderArgs(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    s3_profile: str | None = None
     root_dir: str | None = None
     sources: dict[str, float] = {}
     batch_size: int = 2
@@ -107,6 +112,7 @@ class DataloaderArgs(BaseModel):
                 arrow_batch_size=self.arrow_batch_size,
                 rank=rank,
                 world_size=world_size,
+                s3_profile=self.s3_profile,
             )
             looping_iterator = LoopingIterator(arrow_iterator)
             preprocess_iterator = PreprocessIterator(

@@ -20,3 +20,4 @@ altair
 submitit
 typer
 rich
+fsspec[full]
