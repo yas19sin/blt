@@ -21,3 +21,4 @@ submitit
 typer
 rich
 fsspec[full]
+orjson

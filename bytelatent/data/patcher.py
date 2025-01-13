@@ -82,16 +82,16 @@ def calculate_entropies(
             if device is not None:
                 split = split.to(device)
             assert torch.all(split >= 0) and torch.all(split < 260)
-            pred, _ = entropy_model(split)
+            pred = entropy_model(split)
             pred = pred.reshape(-1, pred.shape[-1])[
                 : split.numel() - pad_size, :
             ]  # [batch_size * seq_len, vocab]
             pred_entropies = entropy(pred)
             entropies.append(pred_entropies)
 
-        entropies = torch.cat(entropies, dim=0)
-        entropies = entropies.reshape(tokens.shape)
-    return entropies
+        concat_entropies = torch.cat(entropies, dim=0)
+        concat_entropies = concat_entropies.reshape(tokens.shape)
+    return concat_entropies
 
 
 def patch_start_mask_from_entropy_with_monotonicity(entropies, t):
