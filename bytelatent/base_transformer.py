@@ -1,5 +1,5 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-
+import os
 from enum import Enum
 from typing import Optional, Tuple, Union
 
@@ -16,7 +16,10 @@ from xformers.ops import AttentionBias, fmha
 
 from bytelatent import probe
 
-flex_attention_comp = torch.compile(flex_attention)
+if int(os.environ.get("BLT_ALLOW_MISSING_FLEX_ATTENTION", False)) == 0:
+    flex_attention_comp = torch.compile(flex_attention)
+else:
+    flex_attention_comp = None
 
 
 class InitStdFactor(Enum):
