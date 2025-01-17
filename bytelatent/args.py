@@ -30,6 +30,7 @@ from bytelatent.model.blt import ByteLatentTransformerArgs
 from bytelatent.optim import OptimArgs
 from bytelatent.profiling import ProfilerArgs
 from bytelatent.tokenizers.build_tokenizer import TokenizerArgs
+from bytelatent.transformer import LMTransformerArgs
 
 logger = logging.getLogger()
 
@@ -163,6 +164,8 @@ class TrainArgs(BaseModel):
 
     seed: int = 42
 
+    debug_dynamo: bool = False
+
     # Number of gradient accumulation steps
     # Total batch size is batch_size*grad_acc_steps
     grad_acc_steps: int = 1
@@ -176,6 +179,10 @@ class TrainArgs(BaseModel):
     data: DataloaderArgs = DataloaderArgs()
     optim: OptimArgs = OptimArgs()
     model: ByteLatentTransformerArgs = ByteLatentTransformerArgs()
+    # This is only needed for training the entropy model
+    entropy_model: LMTransformerArgs | None = None
+    # Instead of training main model, train entropy model
+    train_entropy_model: bool = False
     distributed: DistributedArgs = DistributedArgs()
     env: EnvironmentArgs = EnvironmentArgs()
 

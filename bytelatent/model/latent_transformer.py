@@ -11,6 +11,7 @@ from xformers.ops import AttentionBias
 
 from bytelatent.base_transformer import (
     BaseTransformer,
+    BaseTransformerArgs,
     RMSNorm,
     flex_attention_comp,
     repeat_kv,
@@ -142,11 +143,10 @@ class CrossAttention(nn.Module):
 
 
 class GlobalTransformer(BaseTransformer):
-    def __init__(self, args):
+    def __init__(self, args: BaseTransformerArgs):
         super().__init__(args)
         self.dropout = args.dropout
-        self.sliding_window = args.sliding_window
-        self.efficient_attn = args.efficient_attn
+        self.eos_id = args.eos_id
 
         self.token_embedding_projection = None
         if args.dim_token_emb is not None and args.dim_token_emb != self.dim:
@@ -169,14 +169,19 @@ class GlobalTransformer(BaseTransformer):
         and projection to the token space.
         """
         bs, seqlen = tokens.shape
-        attn_impl = self.efficient_attn
 
         h = embeds
 
         mask = (
             mask
             if mask is not None
-            else create_causal_mask(seqlen, attn_impl, self.sliding_window)
+            else create_causal_mask(
+                seqlen,
+                self.attn_impl,
+                self.attn_bias_type,
+                tokens=tokens,
+                eos_id=self.eos_id,
+            )
         )
 
         if self.token_embedding_projection is not None and h.shape[-1] != self.dim:
@@ -184,7 +189,7 @@ class GlobalTransformer(BaseTransformer):
 
         h = F.dropout(h, p=self.dropout, training=self.training)
 
-        h = super().forward(h, tok_idx=tok_idx, mask=mask, attn_impl=attn_impl)
+        h = super().forward(h, tok_idx=tok_idx, mask=mask, attn_impl=self.attn_impl)
         return h, cache
 
     def init_weights(self, init_base_std: float):

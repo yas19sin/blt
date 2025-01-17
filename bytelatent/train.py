@@ -644,6 +644,10 @@ def main():
     cfg = OmegaConf.merge(default_cfg, file_cfg, cli_args)
     cfg = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
     train_args = TrainArgs.model_validate(cfg)
+    if train_args.debug_dynamo:
+        import torch._dynamo
+
+        torch._dynamo.config.suppress_errors = True
     train(train_args)
 
 
