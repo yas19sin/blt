@@ -91,7 +91,7 @@ def setup_terashuf(work_dir):
 def main(dataset, memory, data_dir, seed=42, nchunks=32, s3_profile: str | None = None):
     # Configuration
     repo_id = {
-        "fineweb_edu_7M": "Lyte/fineweb-edu-2016-26-7M",
+        "fineweb_edu_7M": "Lyte/fineweb-edu-2016-26-750k",
         "fineweb_edu": "HuggingFaceFW/fineweb-edu",
         "fineweb_edu_10bt": "HuggingFaceFW/fineweb-edu",
         "dclm_baseline_1.0": "mlfoundations/dclm-baseline-1.0",
