@@ -125,7 +125,7 @@ class ArrowFileIterator(StatefulIterator):
             shard_files = sorted(shard_files, key=shard_sort_key)
             if len(shard_files) == 0:
                 raise ByteLatentError(
-                    f"Zero shard_files found corresponding to: {file_path} using preprocess_dir={preprocess_dir} and entropy_model_name={entropy_model_name}, so the search path is data_dir={data_dir} for matches to {jsonl_file.name}.shard_*.arrow"
+                    f"Zero shard_files found corresponding to: {file_path} using preprocess_dir={preprocess_dir} and entropy_model_name={entropy_model_name}, so the search path is data_dir={data_dir} for matches to {os.path.basename(jsonl_file)}.shard_*.arrow"
                 )
             self.dataset_files = [f for f in shard_files]
         else:
